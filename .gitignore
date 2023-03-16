@@ -1,0 +1,5 @@
+#ignore
+*.h5
+.env
+config_cryolo.json
+crYOLO_ML_particlepick.ipynb
