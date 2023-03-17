@@ -41,6 +41,8 @@ cs = CryoSPARC(
 # Find project and create job
 project = cs.find_project(args.project)
 job = project.create_external_job(args.workspace, title=args.title)
+curate_job = project.find_job(args.curate_exposures_job_id)
+training_particles_job = project.find_job(args.training_particles_job_id)
 
 # Connect micrographs to the job and add output
 job.connect("train_micrographs", args.curate_exposures_job_id, "split_0", slots=["micrograph_blob"])
@@ -49,7 +51,15 @@ job.connect("all_micrographs", args.curate_exposures_job_id, "split_0", slots=["
 job.connect("all_micrographs", args.curate_exposures_job_id, "remainder", slots=["micrograph_blob"])
 job.add_output("particle", "predicted_particles", slots=["location", "pick_stats"])
 
+# Wait for all previous jobs to finish
+job.start(status="waiting")
+job.log(f"Waiting for job {args.curate_exposures_job_id} and {args.training_particles_job_id} to finish.")
+curate_job.wait_for_status(status="completed")
+training_particles_job.wait_for_status(status="completed")
+job.stop()
+
 # Start the job and set its status to "running"
+job.log(f"Starting job - {job.uid}")
 job.start(status="running")
 
 # Create directories and symlink the data

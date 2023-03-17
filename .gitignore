@@ -1,5 +1,5 @@
 #ignore
-*.h5
+/models
 .env
 config_cryolo.json
 crYOLO_ML_particlepick.ipynb

@@ -11,6 +11,7 @@ parser.add_argument('workspace', type=str, help='Name of workspace to run job in
 parser.add_argument('curate_exposures_job_id', type=str, help='ID of job that curated the micrographs')
 parser.add_argument('box_size', type=int, help='Box size for particle picking (in Angstroms)')
 parser.add_argument('model_path', type=str, help='Path to crYOLO model')
+
 parser.add_argument('--title', type=str, default='crYOLO Picks', help='Title for job (default: "crYOLO Picks")')
 parser.add_argument('--lowpass', type=float, default=0.2, help='Low pass filter cutoff (default: 0.2)')
 parser.add_argument('--threshold', type=float, default=0.1, help='Threshold for particle picking (default: 0.1)')
@@ -36,12 +37,20 @@ cs = CryoSPARC(
 # Find project and create job
 project = cs.find_project(args.project)
 job = project.create_external_job(args.workspace, title=args.title)
+curate_job = project.find_job(args.curate_exposures_job_id)
 
 # Connect micrographs to the job and add output
 job.connect("all_micrographs", args.curate_exposures_job_id, "exposures_accepted", slots=["micrograph_blob"])
 job.add_output("particle", "predicted_particles", slots=["location", "pick_stats"])
 
+# Wait for all previous jobs to finish
+job.start(status="waiting")
+job.log(f"Waiting for job {args.curate_exposures_job_id} to finish.")
+curate_job.wait_for_status(status="completed")
+job.stop()
+
 # Start the job and set its status to "running"
+job.log(f"Starting job - {job.uid}")
 job.start(status="running")
 
 # Create directory and symlink the micrographs
