@@ -1,6 +1,11 @@
 # Cryosparc-tools-scripts
 This repository contains a set of scripts for processing CryoEM data using the [CryoSPARC tools](https://tools.cryosparc.com/intro.html) python library.
 
+## TO DO list:
+- [X] Threshold filtering
+- [ ] Visulize particles in micrographs
+
+# Usage
 ## crYOLO particle picking
 Particle picking scripts inspired from https://tools.cryosparc.com/examples/cryolo.html.
 
@@ -9,11 +14,11 @@ Particle picking scripts inspired from https://tools.cryosparc.com/examples/cryo
 
 The script takes the following command-line arguments:
 
-- project: Name of the project to run the job in.
-- workspace: Name of the workspace to run the job in.
-- curate_exposures_job_id: ID of the job that curated the micrographs.
-- box_size: Box size for particle picking (in Angstroms).
-- model_path: Path to crYOLO model
+- `project` - Name of the project to run the job in.
+- `workspace` - Name of the workspace to run the job in.
+- `curate_exposures_job_id` - ID of the job that curated the micrographs.
+- `box_size` - Box size for particle picking (in Angstroms).
+- `model_path` - Path to crYOLO model
 
 Here is a sample command:
 ``` 
