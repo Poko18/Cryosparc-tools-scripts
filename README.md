@@ -15,4 +15,6 @@ The script takes the following command-line arguments:
 - model_path: Path to crYOLO model
 
 Here is a sample command:
-``` python crYOLO_particlepicker.py P1 W1 J3 110 path_to_model.h5 ```
+``` 
+python crYOLO_particlepicker.py P1 W1 J3 110 path_to_model.h5 
+```
