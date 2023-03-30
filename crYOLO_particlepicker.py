@@ -14,8 +14,8 @@ parser.add_argument('model_path', type=str, help='Path to crYOLO model')
 
 parser.add_argument('--title', type=str, default='crYOLO Picks', help='Title for job (default: "crYOLO Picks")')
 parser.add_argument('--lowpass', type=float, default=0.2, help='Low pass filter cutoff (default: 0.2)')
-parser.add_argument('--threshold', type=float, default=0.1, help='Threshold for particle picking (default: 0.1)')
-parser.add_argument('--baseport', type=str, default=39000, help='Cryosparc baseport')
+parser.add_argument('--threshold', type=float, default=0.001, help='Threshold for particle picking (default: 0.001)')
+parser.add_argument('--baseport', type=str, default=39000, help='Cryosparc baseport (default: 39000)')
 args = parser.parse_args()
 
 # Load login credentials from .env file
@@ -77,28 +77,30 @@ job.subprocess(
     checkpoint=True,
 )
 
-# Fill in a dummy NCC score so that the results may be inspected with an Inspect Picks job.
+# Fill CrYOLO threshold as NCC and power score so that the results may be inspected and filtered with an Inspect Picks job.
 output_star_folder = "STAR"
 all_predicted = []
+
+starfile_path = "boxfiles/CRYOSPARC/cryosparc.star" 
+locations = star.read(job.dir() / starfile_path)[""]
+
 for mic in all_micrographs.rows():
     micrograph_path = mic["micrograph_blob/path"]
     micrograph_name = micrograph_path.split("/")[-1]
     height, width = mic["micrograph_blob/shape"]
 
-    starfile_name = micrograph_name.rsplit(".", 1)[0] + ".star"
-    starfile_path = "boxfiles/STAR/" + starfile_name
-    locations = star.read(job.dir() / starfile_path)[""]
-    center_x = locations["rlnCoordinateX"] / width
-    center_y = locations["rlnCoordinateY"] / height
+    center_x = locations[locations['rlnMicrographName'] == micrograph_name]['rlnCoordinateX'] / width
+    center_y = locations[locations['rlnMicrographName'] == micrograph_name]['rlnCoordinateY'] / height
+    threshold = locations[locations['rlnMicrographName'] == micrograph_name]['rlnAutopickFigureOfMerit']
 
-    predicted = job.alloc_output("predicted_particles", len(locations))
+    predicted = job.alloc_output("predicted_particles", len(locations[locations['rlnMicrographName'] == micrograph_name]))
     predicted["location/micrograph_uid"] = mic["uid"]
     predicted["location/micrograph_path"] = mic["micrograph_blob/path"]
     predicted["location/micrograph_shape"] = mic["micrograph_blob/shape"]
     predicted["location/center_x_frac"] = center_x
     predicted["location/center_y_frac"] = center_y
-    predicted["pick_stats/ncc_score"] = 0.5
-
+    predicted["pick_stats/ncc_score"] = threshold
+    predicted["pick_stats/power"] = threshold
     all_predicted.append(predicted)
 
 # Save particle locations and stop job
