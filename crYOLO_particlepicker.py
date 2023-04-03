@@ -13,8 +13,8 @@ parser.add_argument('box_size', type=int, help='Box size for particle picking (i
 parser.add_argument('model_path', type=str, help='Path to crYOLO model')
 
 parser.add_argument('--title', type=str, default='crYOLO Picks', help='Title for job (default: "crYOLO Picks")')
-parser.add_argument('--lowpass', type=float, default=0.2, help='Low pass filter cutoff (default: 0.2)')
-parser.add_argument('--threshold', type=float, default=0.001, help='Threshold for particle picking (default: 0.001)')
+parser.add_argument('--lowpass', type=float, default=0.1, help='Low pass filter cutoff (default: 0.1)')
+parser.add_argument('--threshold', type=float, default=0.05, help='Threshold for particle picking (default: 0.05)')
 parser.add_argument('--baseport', type=str, default=39000, help='Cryosparc baseport (default: 39000)')
 args = parser.parse_args()
 

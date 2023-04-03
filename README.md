@@ -1,11 +1,14 @@
 # Cryosparc-tools-scripts
 This repository contains a set of scripts for processing CryoEM data using the [CryoSPARC tools](https://tools.cryosparc.com/intro.html) python library.
 
+
 ## TO DO list:
 - [X] Threshold filtering
 - [ ] Visulize particles in micrographs
 
+
 # Usage
+
 ## crYOLO particle picking
 Particle picking scripts inspired from https://tools.cryosparc.com/examples/cryolo.html.
 
