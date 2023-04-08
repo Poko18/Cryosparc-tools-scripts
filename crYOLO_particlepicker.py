@@ -15,6 +15,7 @@ parser.add_argument('model_path', type=str, help='Path to crYOLO model')
 parser.add_argument('--title', type=str, default='crYOLO Picks', help='Title for job (default: "crYOLO Picks")')
 parser.add_argument('--lowpass', type=float, default=0.1, help='Low pass filter cutoff (default: 0.1)')
 parser.add_argument('--threshold', type=float, default=0.05, help='Threshold for particle picking (default: 0.05)')
+parser.add_argument('--predict_batch', type=int, default=3, help='prediction batch (default: 3)')
 parser.add_argument('--baseport', type=str, default=39000, help='Cryosparc baseport (default: 39000)')
 args = parser.parse_args()
 
@@ -71,7 +72,7 @@ job.subprocess(
 
 # Run particle picking job
 job.subprocess(
-    f"cryolo_predict.py -c config_cryolo.json -w {args.model_path} -i full_data -g 0 -o boxfiles -t {args.threshold}".split(" "),
+    f"cryolo_predict.py -c config_cryolo.json -w {args.model_path} -i full_data -g 0 -o boxfiles -t {args.threshold} -pbs {args.predict_batch}".split(" "),
     cwd=job.dir(),
     mute=True,
     checkpoint=True,
