@@ -11,7 +11,7 @@ from numpy.core import records
 parser = argparse.ArgumentParser(description='Run crYOLO particle picking on a set of micrographs within CryoSPARC.')
 parser.add_argument('project', type=str, help='Name of project to run job in')
 parser.add_argument('workspace', type=str, help='Name of workspace to run job in')
-parser.add_argument('curate_exposures_job_id', type=str, help='ID of job that curated the micrographs')
+parser.add_argument('exposure_sets_job_id', type=str, help='ID of exposure sets tool job, used to split micrographs')
 parser.add_argument('training_particles_job_id', type=str, help='ID of job with picked particles for training')
 parser.add_argument('box_size', type=int, help='Box size for particle picking (in Angstroms)')
 parser.add_argument('--title', type=str, default='crYOLO trained picks', help='Title for job (default: "crYOLO Picks")')
@@ -42,19 +42,19 @@ cs = CryoSPARC(
 # Find project and create job
 project = cs.find_project(args.project)
 job = project.create_external_job(args.workspace, title=args.title)
-curate_job = project.find_job(args.curate_exposures_job_id)
+curate_job = project.find_job(args.exposure_sets_job_id)
 training_particles_job = project.find_job(args.training_particles_job_id)
 
 # Connect micrographs to the job and add output
-job.connect("train_micrographs", args.curate_exposures_job_id, "split_0", slots=["micrograph_blob"])
+job.connect("train_micrographs", args.exposure_sets_job_id, "split_0", slots=["micrograph_blob"])
 job.connect("train_particles", args.training_particles_job_id, "particles_selected", slots=["location"])
-job.connect("all_micrographs", args.curate_exposures_job_id, "split_0", slots=["micrograph_blob"])
-job.connect("all_micrographs", args.curate_exposures_job_id, "remainder", slots=["micrograph_blob"])
+job.connect("all_micrographs", args.exposure_sets_job_id, "split_0", slots=["micrograph_blob"])
+job.connect("all_micrographs", args.exposure_sets_job_id, "remainder", slots=["micrograph_blob"])
 job.add_output("particle", "predicted_particles", slots=["location", "pick_stats"])
 
 # Wait for all previous jobs to finish
 job.start(status="waiting")
-job.log(f"Waiting for job {args.curate_exposures_job_id} and {args.training_particles_job_id} to finish.")
+job.log(f"Waiting for job {args.exposure_sets_job_id} and {args.training_particles_job_id} to finish.")
 curate_job.wait_for_status(status="completed")
 training_particles_job.wait_for_status(status="completed")
 job.stop()

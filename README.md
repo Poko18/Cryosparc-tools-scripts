@@ -4,6 +4,7 @@ This repository contains a set of scripts for processing CryoEM data using the [
 ### TO DO list:
 - [X] Threshold filtering
 - [ ] Visulize particles in micrographs
+- [ ] Only train on particles from selected micrograph
 
 # Usage
 
