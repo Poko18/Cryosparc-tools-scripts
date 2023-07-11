@@ -117,6 +117,7 @@ job.subprocess(
 # Training
 #To run the training on GPU 0 with 5 warmup-epochs and an early stop
 # of 15 navigate to the folder with config_cryolo.json file, train_image folder etc.
+print("start training...")
 job.subprocess(
     "cryolo_train.py -c config_cryolo.json -w 5 -g 0 -e 15".split(" "), #
     cwd=job.dir(),
@@ -124,6 +125,7 @@ job.subprocess(
     checkpoint=True,
     checkpoint_line_pattern=r"Epoch \d+/\d+",  # e.g., "Epoch 42/200"
 )
+print("done training...")
 
 # Run particle picking job
 job.mkdir("boxfiles")
