@@ -1,5 +1,7 @@
 #ignore
 /models
+/old
 .env
 config_cryolo.json
 crYOLO_ML_particlepick.ipynb
+cryoDRGN_trainer.ipynb
