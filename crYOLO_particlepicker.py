@@ -6,8 +6,8 @@ from cryosparc.dataset import Dataset
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Run crYOLO particle picking on a set of micrographs within CryoSPARC.')
-parser.add_argument('project', type=str, help='Name of project to run job in')
-parser.add_argument('workspace', type=str, help='Name of workspace to run job in')
+parser.add_argument('project', type=str, help='Name of project to run the job in')
+parser.add_argument('workspace', type=str, help='Name of workspace to run the job in')
 parser.add_argument('curate_exposures_job_id', type=str, help='ID of job that curated the micrographs')
 parser.add_argument('box_size', type=int, help='Box size for particle picking (in Angstroms)')
 parser.add_argument('model_path', type=str, help='Path to crYOLO model')
