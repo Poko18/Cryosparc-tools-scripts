@@ -68,3 +68,8 @@ The script takes the following command-line arguments:
 - `workspace` - Name of the workspace to run the job in.
 - `refinement_job_id` - ID of the C1 `Homogeneous Refinement` job
 - `downsample_job_id` - ID of the downsample particle job
+
+Here is a sample command:
+``` 
+python cryodrgn_trainer_downsampled.py P1 W1 J10 J11
+```
