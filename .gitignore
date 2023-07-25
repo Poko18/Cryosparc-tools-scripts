@@ -1,7 +1,9 @@
 #ignore
 /models
 /old
+/pyem
 .env
 config_cryolo.json
 crYOLO_ML_particlepick.ipynb
 cryoDRGN_trainer.ipynb
+cs2star_2Dparticles.ipynb

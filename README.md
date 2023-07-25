@@ -7,10 +7,24 @@ This repository contains a set of scripts for processing CryoEM data using the [
     - [crYOLO_trainedpicker.py](#cryolo_trainedpickerpy)
 - [cryodrgn](#cryodrgn)
     - [cryodrgn_trainer_downsampled.py](#cryodrgn_trainer_downsampledpy)
+- [cs2star](#cs2star)
+    - [cs2star_2Dparticles.py](#cs2star_2Dparticles.py)
 
 # Scripts:
 ## crYOLO particle picking
 Particle picking scripts inspired from https://tools.cryosparc.com/examples/cryolo.html.
+
+### Installation
+Create conda environment following the tutorial from the link above. But in short:
+```
+conda create -n cryolo -c conda-forge \
+   python=3 numpy==1.18.5 \
+   libtiff pyqt=5 wxPython=4.1.1 adwaita-icon-theme
+conda activate cryolo
+pip install -U pip
+pip install nvidia-pyindex
+pip install cryolo[c11] cryosparc-tools
+```
 
 ### <b>crYOLO_particlepicker.py</b>
 `crYOLO_particlepicker.py` script enables you to perform crYOLO particle picking in CryoSPARC. 
@@ -54,7 +68,16 @@ python crYOLO_trainedpicker.py P1 W1 J3 J5 110
 ---
 
 ## cryodrgn
-Script for running cryodrgn in cryosparc.
+Script for running [cryodrgn](https://github.com/zhonge/cryodrgn/tree/master) in cryosparc.
+
+### Installation
+Before use, create conda environment for cryodrgn and make sure pytorch is working on your GPU.
+```
+conda create --name cryodrgn python=3.9
+conda activate cryodrgn
+pip install cryodrgn
+pip install cryosparc-tools
+```
 
 ### <b>cryodrgn_trainer_downsampled.py</b>
 `cryodrgn_trainer_downsampled.py` script enables you to train cryodrgn model and do basic analysis in CryoSPARC.
@@ -73,3 +96,23 @@ Here is a sample command:
 ``` 
 python cryodrgn_trainer_downsampled.py P1 W1 J10 J11
 ```
+
+## cs2star
+Scripts using pyem (https://github.com/asarnow/pyem) in cryosparc.
+
+### installation
+Create pyem conda environment before use:
+```
+conda create -n pyem
+conda activate pyem
+conda install numpy scipy matplotlib seaborn numba pandas natsort
+conda install -c conda-forge pyfftw healpy pathos
+git clone https://github.com/asarnow/pyem.git
+cd pyem
+pip install --no-dependencies -e .
+pip install cryosparc-tools
+```
+
+### cs2star_2Dparticles.py
+`cs2star_2Dparticles.py` script enables you to directly prepare particles for Relion by just specifiying project, workspace and `2D classification` or `Select 2D` job.
+

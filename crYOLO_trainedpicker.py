@@ -12,7 +12,7 @@ parser = argparse.ArgumentParser(description='Run crYOLO particle picking on a s
 parser.add_argument('project', type=str, help='Name of project to run job in')
 parser.add_argument('workspace', type=str, help='Name of workspace to run job in')
 parser.add_argument('training_particles_job_id', type=str, help='ID of job with picked particles for training (usually Select 2D job)')
-parser.add_argument('exposure_sets_job_id', type=str, help='ID of exposure sets tool job, used to split micrographs (usually train on 20-30% of exposures)')
+parser.add_argument('exposure_sets_job_id', type=str, help='ID of exposure sets tool job, used to split micrographs (usually train on 20-30percent of exposures)')
 parser.add_argument('box_size', type=int, help='Box size for particle picking (in Angstroms)')
 parser.add_argument('--title', type=str, default='crYOLO trained picks', help='Title for job (default: "crYOLO Picks")')
 parser.add_argument('--lowpass', type=float, default=0.1, help='Low pass filter cutoff (default: 0.1)')
