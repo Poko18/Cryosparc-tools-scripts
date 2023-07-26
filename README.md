@@ -100,6 +100,9 @@ python cryodrgn_trainer_downsampled.py P1 W1 J10 J11
 ## cs2star
 Scripts using pyem (https://github.com/asarnow/pyem) in cryosparc.
 
+TODO:
+- [ ] input cryosparc job, run relion schema and output results back in cryosparc
+
 ### installation
 Create pyem conda environment before use:
 ```
@@ -114,5 +117,16 @@ pip install cryosparc-tools
 ```
 
 ### cs2star_2Dparticles.py
-`cs2star_2Dparticles.py` script enables you to directly prepare particles for Relion by just specifiying project, workspace and `2D classification` or `Select 2D` job.
+`cs2star_2Dparticles.py` script enables you to directly prepare particles for Relion by just specifiying project, `Select 2D` job and path to relion projct folder.
 
+> **Note:** Script does not create a job in CryoSparc. It just sources the paths an folders
+
+The script takes the following command-line arguments:
+- `project` - Name of the project with `2D select` job.
+- `select2D_job_id` - ID of the `Select 2D` job.
+- `relion_project_path` - Path to the RELION project
+
+Here is a sample command:
+```
+python cs2star_2Dparticles.py P2 J12 path_to_relion_project
+```
