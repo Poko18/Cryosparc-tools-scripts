@@ -8,7 +8,7 @@ This repository contains a set of scripts for processing CryoEM data using the [
 - [cryodrgn](#cryodrgn)
     - [cryodrgn_trainer_downsampled.py](#cryodrgn_trainer_downsampledpy)
 - [cs2star](#cs2star)
-    - [cs2star_2Dparticles.py](#cs2star_2Dparticles.py)
+    - [cs2star_2Dparticles.py](#cs2star_2Dparticlespy)
 
 # Scripts:
 ## crYOLO particle picking
