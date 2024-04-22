@@ -1,39 +1,34 @@
 import argparse
-from dotenv import dotenv_values
-from cryosparc.tools import CryoSPARC
+
 from cryosparc import star
 from cryosparc.dataset import Dataset
+from cryosparc.tools import CryoSPARC
+from dotenv import dotenv_values
 
 # Parse command line arguments
-parser = argparse.ArgumentParser(description='Run crYOLO particle picking on a set of micrographs within CryoSPARC.')
-parser.add_argument('project', type=str, help='Name of project to run the job in')
-parser.add_argument('workspace', type=str, help='Name of workspace to run the job in')
-parser.add_argument('curate_exposures_job_id', type=str, help='ID of job that curated the micrographs')
-parser.add_argument('box_size', type=int, help='Box size for particle picking (in Angstroms)')
-parser.add_argument('model_path', type=str, help='Path to crYOLO model')
+parser = argparse.ArgumentParser(description="Run crYOLO particle picking on a set of micrographs within CryoSPARC.")
+parser.add_argument("project", type=str, help="Name of project to run the job in")
+parser.add_argument("workspace", type=str, help="Name of workspace to run the job in")
+parser.add_argument("curate_exposures_job_id", type=str, help="ID of job that curated the micrographs")
+parser.add_argument("box_size", type=int, help="Box size for particle picking (in Angstroms)")
+parser.add_argument("model_path", type=str, help="Path to crYOLO model")
 
-parser.add_argument('--title', type=str, default='crYOLO Picks', help='Title for job (default: "crYOLO Picks")')
-parser.add_argument('--lowpass', type=float, default=0.1, help='Low pass filter cutoff (default: 0.1)')
-parser.add_argument('--threshold', type=float, default=0.05, help='Threshold for particle picking (default: 0.05)')
-parser.add_argument('--predict_batch', type=int, default=3, help='prediction batch (default: 3)')
-parser.add_argument('--baseport', type=str, default=39000, help='Cryosparc baseport (default: 39000)')
+parser.add_argument("--title", type=str, default="crYOLO Picks", help='Title for job (default: "crYOLO Picks")')
+parser.add_argument("--lowpass", type=float, default=0.1, help="Low pass filter cutoff (default: 0.1)")
+parser.add_argument("--threshold", type=float, default=0.05, help="Threshold for particle picking (default: 0.05)")
+parser.add_argument("--predict_batch", type=int, default=3, help="prediction batch (default: 3)")
+parser.add_argument("--baseport", type=str, default=39000, help="Cryosparc baseport (default: 39000)")
 args = parser.parse_args()
 
 # Load login credentials from .env file
-env_vars = dotenv_values('.env')
-license = env_vars['CRYOSPARC_LICENSE_ID']
-host = env_vars['CRYOSPARC_HOST']
-email = env_vars['CRYOSPARC_EMAIL']
-password = env_vars['CRYOSPARC_PASSWORD']
+env_vars = dotenv_values(".env")
+license = env_vars["CRYOSPARC_LICENSE_ID"]
+host = env_vars["CRYOSPARC_HOST"]
+email = env_vars["CRYOSPARC_EMAIL"]
+password = env_vars["CRYOSPARC_PASSWORD"]
 
 # Connect to CryoSPARC instance
-cs = CryoSPARC(
-    license=license,
-    host=host,
-    base_port=args.baseport,
-    email=email,
-    password=password
-)
+cs = CryoSPARC(license=license, host=host, base_port=args.baseport, email=email, password=password)
 
 # Find project and create job
 project = cs.find_project(args.project)
@@ -82,7 +77,7 @@ job.subprocess(
 output_star_folder = "STAR"
 all_predicted = []
 
-starfile_path = "boxfiles/CRYOSPARC/cryosparc.star" 
+starfile_path = "boxfiles/CRYOSPARC/cryosparc.star"
 locations = star.read(job.dir() / starfile_path)[""]
 
 for mic in all_micrographs.rows():
@@ -90,11 +85,11 @@ for mic in all_micrographs.rows():
     micrograph_name = micrograph_path.split("/")[-1]
     height, width = mic["micrograph_blob/shape"]
 
-    center_x = locations[locations['rlnMicrographName'] == micrograph_name]['rlnCoordinateX'] / width
-    center_y = locations[locations['rlnMicrographName'] == micrograph_name]['rlnCoordinateY'] / height
-    threshold = locations[locations['rlnMicrographName'] == micrograph_name]['rlnAutopickFigureOfMerit']
+    center_x = locations[locations["rlnMicrographName"] == micrograph_name]["rlnCoordinateX"] / width
+    center_y = locations[locations["rlnMicrographName"] == micrograph_name]["rlnCoordinateY"] / height
+    threshold = locations[locations["rlnMicrographName"] == micrograph_name]["rlnAutopickFigureOfMerit"]
 
-    predicted = job.alloc_output("predicted_particles", len(locations[locations['rlnMicrographName'] == micrograph_name]))
+    predicted = job.alloc_output("predicted_particles", len(locations[locations["rlnMicrographName"] == micrograph_name]))
     predicted["location/micrograph_uid"] = mic["uid"]
     predicted["location/micrograph_path"] = mic["micrograph_blob/path"]
     predicted["location/micrograph_shape"] = mic["micrograph_blob/shape"]

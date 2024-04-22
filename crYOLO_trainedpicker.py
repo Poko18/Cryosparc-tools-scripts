@@ -1,43 +1,38 @@
 import argparse
-from dotenv import dotenv_values
-from cryosparc.tools import CryoSPARC
+from io import StringIO
+
+import numpy as np
 from cryosparc import star
 from cryosparc.dataset import Dataset
-from io import StringIO
-import numpy as np
+from cryosparc.tools import CryoSPARC
+from dotenv import dotenv_values
 from numpy.core import records
 
 # Parse command line arguments
-parser = argparse.ArgumentParser(description='Run crYOLO particle picking on a set of micrographs within CryoSPARC.')
-parser.add_argument('project', type=str, help='Name of project to run job in')
-parser.add_argument('workspace', type=str, help='Name of workspace to run job in')
-parser.add_argument('training_particles_job_id', type=str, help='ID of job with picked particles for training (usually Select 2D job)')
-parser.add_argument('exposure_sets_job_id', type=str, help='ID of exposure sets tool job, used to split micrographs (usually train on 20-30percent of exposures)')
-parser.add_argument('box_size', type=int, help='Box size for particle picking (in Angstroms)')
-parser.add_argument('--title', type=str, default='crYOLO trained picks', help='Title for job (default: "crYOLO Picks")')
-parser.add_argument('--lowpass', type=float, default=0.1, help='Low pass filter cutoff (default: 0.1)')
-parser.add_argument('--predict_batch', type=int, default=3, help='prediction batch (default: 3)')
-parser.add_argument('--threshold', type=float, default=0.05, help='Threshold for particle picking (default: 0.05)')
-parser.add_argument('--baseport', type=str, default=39000, help='Cryosparc baseport (default: 39000)')
-parser.add_argument('--batch_size', type=str, default="2", help='Set crYOLO training batch size (default: 2)')
-parser.add_argument('--pretrained_weights', type=str, default="", help='Start training from pretrained weights (default: "")')
+parser = argparse.ArgumentParser(description="Run crYOLO particle picking on a set of micrographs within CryoSPARC.")
+parser.add_argument("project", type=str, help="Name of project to run job in")
+parser.add_argument("workspace", type=str, help="Name of workspace to run job in")
+parser.add_argument("training_particles_job_id", type=str, help="ID of job with picked particles for training (usually Select 2D job)")
+parser.add_argument("exposure_sets_job_id", type=str, help="ID of exposure sets tool job, used to split micrographs (usually train on 20-30percent of exposures)")
+parser.add_argument("box_size", type=int, help="Box size for particle picking (in Angstroms)")
+parser.add_argument("--title", type=str, default="crYOLO trained picks", help='Title for job (default: "crYOLO Picks")')
+parser.add_argument("--lowpass", type=float, default=0.1, help="Low pass filter cutoff (default: 0.1)")
+parser.add_argument("--predict_batch", type=int, default=3, help="prediction batch (default: 3)")
+parser.add_argument("--threshold", type=float, default=0.05, help="Threshold for particle picking (default: 0.05)")
+parser.add_argument("--baseport", type=str, default=39000, help="Cryosparc baseport (default: 39000)")
+parser.add_argument("--batch_size", type=str, default="2", help="Set crYOLO training batch size (default: 2)")
+parser.add_argument("--pretrained_weights", type=str, default="", help='Start training from pretrained weights (default: "")')
 args = parser.parse_args()
 
 # Load login credentials from .env file
-env_vars = dotenv_values('.env')
-license = env_vars['CRYOSPARC_LICENSE_ID']
-host = env_vars['CRYOSPARC_HOST']
-email = env_vars['CRYOSPARC_EMAIL']
-password = env_vars['CRYOSPARC_PASSWORD']
+env_vars = dotenv_values(".env")
+license = env_vars["CRYOSPARC_LICENSE_ID"]
+host = env_vars["CRYOSPARC_HOST"]
+email = env_vars["CRYOSPARC_EMAIL"]
+password = env_vars["CRYOSPARC_PASSWORD"]
 
 # Connect to CryoSPARC instance
-cs = CryoSPARC(
-    license=license,
-    host=host,
-    base_port=args.baseport,
-    email=email,
-    password=password
-)
+cs = CryoSPARC(license=license, host=host, base_port=args.baseport, email=email, password=password)
 
 # Find project and create job
 project = cs.find_project(args.project)
@@ -115,11 +110,11 @@ job.subprocess(
 )
 
 # Training
-#To run the training on GPU 0 with 5 warmup-epochs and an early stop
+# To run the training on GPU 0 with 5 warmup-epochs and an early stop
 # of 15 navigate to the folder with config_cryolo.json file, train_image folder etc.
 print("start training...")
 job.subprocess(
-    "cryolo_train.py -c config_cryolo.json -w 5 -g 0 -e 15".split(" "), #
+    "cryolo_train.py -c config_cryolo.json -w 5 -g 0 -e 15".split(" "),  #
     cwd=job.dir(),
     mute=True,
     checkpoint=True,
@@ -140,7 +135,7 @@ job.subprocess(
 output_star_folder = "STAR"
 all_predicted = []
 
-starfile_path = "boxfiles/CRYOSPARC/cryosparc.star" 
+starfile_path = "boxfiles/CRYOSPARC/cryosparc.star"
 locations = star.read(job.dir() / starfile_path)[""]
 
 for mic in all_micrographs.rows():
@@ -148,11 +143,11 @@ for mic in all_micrographs.rows():
     micrograph_name = micrograph_path.split("/")[-1]
     height, width = mic["micrograph_blob/shape"]
 
-    center_x = locations[locations['rlnMicrographName'] == micrograph_name]['rlnCoordinateX'] / width
-    center_y = locations[locations['rlnMicrographName'] == micrograph_name]['rlnCoordinateY'] / height
-    threshold = locations[locations['rlnMicrographName'] == micrograph_name]['rlnAutopickFigureOfMerit']
+    center_x = locations[locations["rlnMicrographName"] == micrograph_name]["rlnCoordinateX"] / width
+    center_y = locations[locations["rlnMicrographName"] == micrograph_name]["rlnCoordinateY"] / height
+    threshold = locations[locations["rlnMicrographName"] == micrograph_name]["rlnAutopickFigureOfMerit"]
 
-    predicted = job.alloc_output("predicted_particles", len(locations[locations['rlnMicrographName'] == micrograph_name]))
+    predicted = job.alloc_output("predicted_particles", len(locations[locations["rlnMicrographName"] == micrograph_name]))
     predicted["location/micrograph_uid"] = mic["uid"]
     predicted["location/micrograph_path"] = mic["micrograph_blob/path"]
     predicted["location/micrograph_shape"] = mic["micrograph_blob/shape"]

@@ -1,7 +1,8 @@
-import os
-import glob
 import argparse
+import glob
+import os
 import subprocess
+
 from cryosparc.tools import CryoSPARC
 from dotenv import dotenv_values
 
@@ -12,35 +13,29 @@ parser.add_argument("select2D_job_id", type=str, help="ID of the Select 2D job")
 parser.add_argument("relion_project_path", type=str, help="Path to the RELION project")
 parser.add_argument("--pyem_path", type=str, default="/media/longstorage/Tadej/Cryosparc-tools-scripts/pyem/", help="Path to pyem directory")
 parser.add_argument("--star_file_output_prefix", type=str, default="particles_from_cs", help="Output prefix for the STAR file")
-parser.add_argument('--baseport', type=str, default=39000, help='Cryosparc baseport (default: 39000)')
+parser.add_argument("--baseport", type=str, default=39000, help="Cryosparc baseport (default: 39000)")
 args = parser.parse_args()
 
 # TO DO
 # parse .star file and prepare mrcs links
 def get_star_path(star_file_path):
-    with open(star_file_path, 'r') as star_file:
+    with open(star_file_path, "r") as star_file:
         for line in star_file:
             if line.startswith("000001@"):
                 star_mrc_path = "/".join(line.split(" ")[0].split("000001@")[1].split("/")[:-1])
 
-
     return star_mrc_path
 
+
 # Load login credentials from .env file
-env_vars = dotenv_values('.env')
-license = env_vars['CRYOSPARC_LICENSE_ID']
-host = env_vars['CRYOSPARC_HOST']
-email = env_vars['CRYOSPARC_EMAIL']
-password = env_vars['CRYOSPARC_PASSWORD']
+env_vars = dotenv_values(".env")
+license = env_vars["CRYOSPARC_LICENSE_ID"]
+host = env_vars["CRYOSPARC_HOST"]
+email = env_vars["CRYOSPARC_EMAIL"]
+password = env_vars["CRYOSPARC_PASSWORD"]
 
 # Connect to CryoSPARC instance
-cs = CryoSPARC(
-    license=license,
-    host=host,
-    base_port=args.baseport,
-    email=email,
-    password=password
-)
+cs = CryoSPARC(license=license, host=host, base_port=args.baseport, email=email, password=password)
 
 # Retrieve arguments
 project = args.project
@@ -75,7 +70,7 @@ except subprocess.CalledProcessError as e:
     print(f"Error occurred when modifying the STAR file (mrc --> mrcs): {e}")
 
 # mkdir for mrc files (particles)
-star_mrc_path=get_star_path(f"{relion_project_path}/{star_file_output_prefix}.star")
+star_mrc_path = get_star_path(f"{relion_project_path}/{star_file_output_prefix}.star")
 os.makedirs(f"{relion_project_path}/{star_mrc_path}", exist_ok=True)
 print(f"Created directory for particle mrc files: {relion_project_path}/{star_mrc_path}")
 
@@ -90,7 +85,7 @@ try:
         if not os.path.exists(target_file):
             os.symlink(mrc_file, target_file)
 
-    #subprocess.run(f"ln -s {cs_job_extract_path}/*mrc -t {target_path}", shell=True, check=True)
+    # subprocess.run(f"ln -s {cs_job_extract_path}/*mrc -t {target_path}", shell=True, check=True)
     print("mrc files are linked successfully")
 
     # Rename .mrc files to .mrcs
@@ -99,7 +94,7 @@ try:
     for mrc_file in target_mrc_files:
         if mrc_file.endswith(".mrc"):
             mrcs_file = mrc_file[:-4] + ".mrcs"
-            #print(mrc_file, mrcs_file)
+            # print(mrc_file, mrcs_file)
             os.rename(mrc_file, mrcs_file)
 
     print("Renaming MRC files to MRCS completed successfully.")

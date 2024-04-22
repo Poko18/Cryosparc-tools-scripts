@@ -27,7 +27,7 @@ pip install cryolo[c11] cryosparc-tools
 ```
 
 ### <b>crYOLO_particlepicker.py</b>
-`crYOLO_particlepicker.py` script enables you to perform crYOLO particle picking in CryoSPARC. 
+`crYOLO_particlepicker.py` script enables you to perform crYOLO particle picking in CryoSPARC.
 
 The script takes `Curated Exposures` and predicts particle locations. Particle picks can then be filtered by threshold in an `Inspect Picks` job.
 
@@ -39,14 +39,14 @@ The script takes the following command-line arguments:
 - `model_path` - Path to crYOLO model
 
 Here is a sample command:
-``` 
-python crYOLO_particlepicker.py P1 W1 J3 110 path_to_model.h5 
+```
+python crYOLO_particlepicker.py P1 W1 J3 110 path_to_model.h5
 ```
 
 ---
 
 ### <b>crYOLO_trainedpicker.py</b>
-`crYOLO_trainedpicker.py` script enables you to train crYOLO particle picking model and use it to pick particles in CryoSPARC. 
+`crYOLO_trainedpicker.py` script enables you to train crYOLO particle picking model and use it to pick particles in CryoSPARC.
 
 The script takes in picked particles for training, usually from `Select 2D` job. Another importatnt input is the `Exposure Sets` job with split micrographs for training and testing. Particle picks can then be filtered by threshold in an `Inspect Picks` job.
 
@@ -61,7 +61,7 @@ The script takes the following command-line arguments:
 - `model_path` - Path to crYOLO model
 
 Here is a sample command:
-``` 
+```
 python crYOLO_trainedpicker.py P1 W1 J3 J5 110
 ```
 
@@ -93,7 +93,7 @@ The script takes the following command-line arguments:
 - `downsample_job_id` - ID of the downsample particle job
 
 Here is a sample command:
-``` 
+```
 python cryodrgn_trainer_downsampled.py P1 W1 J10 J11
 ```
 
