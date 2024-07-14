@@ -13,9 +13,19 @@ parser.add_argument("curate_exposures_job_id", type=str, help="ID of job that cu
 parser.add_argument("box_size", type=int, help="Box size for particle picking (in Angstroms)")
 parser.add_argument("model_path", type=str, help="Path to crYOLO model")
 
-parser.add_argument("--title", type=str, default="crYOLO Picks", help='Title for job (default: "crYOLO Picks")')
+parser.add_argument(
+    "--title",
+    type=str,
+    default="crYOLO Picks",
+    help='Title for job (default: "crYOLO Picks")',
+)
 parser.add_argument("--lowpass", type=float, default=0.1, help="Low pass filter cutoff (default: 0.1)")
-parser.add_argument("--threshold", type=float, default=0.05, help="Threshold for particle picking (default: 0.05)")
+parser.add_argument(
+    "--threshold",
+    type=float,
+    default=0.05,
+    help="Threshold for particle picking (default: 0.05)",
+)
 parser.add_argument("--predict_batch", type=int, default=3, help="prediction batch (default: 3)")
 parser.add_argument("--baseport", type=str, default=39000, help="Cryosparc baseport (default: 39000)")
 args = parser.parse_args()
@@ -36,7 +46,12 @@ job = project.create_external_job(args.workspace, title=args.title)
 curate_job = project.find_job(args.curate_exposures_job_id)
 
 # Connect micrographs to the job and add output
-job.connect("all_micrographs", args.curate_exposures_job_id, "exposures_accepted", slots=["micrograph_blob"])
+job.connect(
+    "all_micrographs",
+    args.curate_exposures_job_id,
+    "exposures_accepted",
+    slots=["micrograph_blob"],
+)
 job.add_output("particle", "predicted_particles", slots=["location", "pick_stats"])
 
 # Wait for all previous jobs to finish
@@ -89,7 +104,10 @@ for mic in all_micrographs.rows():
     center_y = locations[locations["rlnMicrographName"] == micrograph_name]["rlnCoordinateY"] / height
     threshold = locations[locations["rlnMicrographName"] == micrograph_name]["rlnAutopickFigureOfMerit"]
 
-    predicted = job.alloc_output("predicted_particles", len(locations[locations["rlnMicrographName"] == micrograph_name]))
+    predicted = job.alloc_output(
+        "predicted_particles",
+        len(locations[locations["rlnMicrographName"] == micrograph_name]),
+    )
     predicted["location/micrograph_uid"] = mic["uid"]
     predicted["location/micrograph_path"] = mic["micrograph_blob/path"]
     predicted["location/micrograph_shape"] = mic["micrograph_blob/shape"]

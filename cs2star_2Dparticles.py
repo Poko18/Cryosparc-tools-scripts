@@ -11,10 +11,21 @@ parser = argparse.ArgumentParser(description="Convert particles from cryoSPARC t
 parser.add_argument("project", type=str, help="cryoSPARC project name")
 parser.add_argument("select2D_job_id", type=str, help="ID of the Select 2D job")
 parser.add_argument("relion_project_path", type=str, help="Path to the RELION project")
-parser.add_argument("--pyem_path", type=str, default="/media/longstorage/Tadej/Cryosparc-tools-scripts/pyem/", help="Path to pyem directory")
-parser.add_argument("--star_file_output_prefix", type=str, default="particles_from_cs", help="Output prefix for the STAR file")
+parser.add_argument(
+    "--pyem_path",
+    type=str,
+    default="/media/longstorage/Tadej/Cryosparc-tools-scripts/pyem/",
+    help="Path to pyem directory",
+)
+parser.add_argument(
+    "--star_file_output_prefix",
+    type=str,
+    default="particles_from_cs",
+    help="Output prefix for the STAR file",
+)
 parser.add_argument("--baseport", type=str, default=39000, help="Cryosparc baseport (default: 39000)")
 args = parser.parse_args()
+
 
 # TO DO
 # parse .star file and prepare mrcs links

@@ -12,16 +12,44 @@ from numpy.core import records
 parser = argparse.ArgumentParser(description="Run crYOLO particle picking on a set of micrographs within CryoSPARC.")
 parser.add_argument("project", type=str, help="Name of project to run job in")
 parser.add_argument("workspace", type=str, help="Name of workspace to run job in")
-parser.add_argument("training_particles_job_id", type=str, help="ID of job with picked particles for training (usually Select 2D job)")
-parser.add_argument("exposure_sets_job_id", type=str, help="ID of exposure sets tool job, used to split micrographs (usually train on 20-30percent of exposures)")
+parser.add_argument(
+    "training_particles_job_id",
+    type=str,
+    help="ID of job with picked particles for training (usually Select 2D job)",
+)
+parser.add_argument(
+    "exposure_sets_job_id",
+    type=str,
+    help="ID of exposure sets tool job, used to split micrographs (usually train on 20-30percent of exposures)",
+)
 parser.add_argument("box_size", type=int, help="Box size for particle picking (in Angstroms)")
-parser.add_argument("--title", type=str, default="crYOLO trained picks", help='Title for job (default: "crYOLO Picks")')
+parser.add_argument(
+    "--title",
+    type=str,
+    default="crYOLO trained picks",
+    help='Title for job (default: "crYOLO Picks")',
+)
 parser.add_argument("--lowpass", type=float, default=0.1, help="Low pass filter cutoff (default: 0.1)")
 parser.add_argument("--predict_batch", type=int, default=3, help="prediction batch (default: 3)")
-parser.add_argument("--threshold", type=float, default=0.05, help="Threshold for particle picking (default: 0.05)")
+parser.add_argument(
+    "--threshold",
+    type=float,
+    default=0.05,
+    help="Threshold for particle picking (default: 0.05)",
+)
 parser.add_argument("--baseport", type=str, default=39000, help="Cryosparc baseport (default: 39000)")
-parser.add_argument("--batch_size", type=str, default="2", help="Set crYOLO training batch size (default: 2)")
-parser.add_argument("--pretrained_weights", type=str, default="", help='Start training from pretrained weights (default: "")')
+parser.add_argument(
+    "--batch_size",
+    type=str,
+    default="2",
+    help="Set crYOLO training batch size (default: 2)",
+)
+parser.add_argument(
+    "--pretrained_weights",
+    type=str,
+    default="",
+    help='Start training from pretrained weights (default: "")',
+)
 args = parser.parse_args()
 
 # Load login credentials from .env file
@@ -42,7 +70,12 @@ training_particles_job = project.find_job(args.training_particles_job_id)
 
 # Connect micrographs to the job and add output
 job.connect("train_micrographs", args.exposure_sets_job_id, "split_0", slots=["micrograph_blob"])
-job.connect("train_particles", args.training_particles_job_id, "particles_selected", slots=["location"])
+job.connect(
+    "train_particles",
+    args.training_particles_job_id,
+    "particles_selected",
+    slots=["location"],
+)
 job.connect("all_micrographs", args.exposure_sets_job_id, "split_0", slots=["micrograph_blob"])
 job.connect("all_micrographs", args.exposure_sets_job_id, "remainder", slots=["micrograph_blob"])
 job.add_output("particle", "predicted_particles", slots=["location", "pick_stats"])
@@ -147,7 +180,10 @@ for mic in all_micrographs.rows():
     center_y = locations[locations["rlnMicrographName"] == micrograph_name]["rlnCoordinateY"] / height
     threshold = locations[locations["rlnMicrographName"] == micrograph_name]["rlnAutopickFigureOfMerit"]
 
-    predicted = job.alloc_output("predicted_particles", len(locations[locations["rlnMicrographName"] == micrograph_name]))
+    predicted = job.alloc_output(
+        "predicted_particles",
+        len(locations[locations["rlnMicrographName"] == micrograph_name]),
+    )
     predicted["location/micrograph_uid"] = mic["uid"]
     predicted["location/micrograph_path"] = mic["micrograph_blob/path"]
     predicted["location/micrograph_shape"] = mic["micrograph_blob/shape"]

@@ -20,7 +20,12 @@ parser.add_argument("--multigpu", type=str, help="Write which GPUs to use (2,3)"
 
 parser.add_argument("--title", type=str, default="cryodrgn", help="Title for job (default: cryodrgn)")
 parser.add_argument("--baseport", type=str, default=39000, help="Cryosparc baseport (default: 39000)")
-parser.add_argument("--numexpr_max_threads", type=str, default="32", help="numexpr max threads (default: 32)")
+parser.add_argument(
+    "--numexpr_max_threads",
+    type=str,
+    default="32",
+    help="numexpr max threads (default: 32)",
+)
 args = parser.parse_args()
 
 # TO DO load poses and ctf directly from connected job
@@ -43,7 +48,12 @@ project = cs.find_project(args.project)
 job = project.create_external_job(args.workspace, title=args.title)
 
 # job.connect("particles", args.refinement_job_id, "particles", slots=["blob", "alignments3D", "ctf"])
-job.connect("particles", args.downsample_job_id, "particles", slots=["blob", "alignments3D", "ctf"])
+job.connect(
+    "particles",
+    args.downsample_job_id,
+    "particles",
+    slots=["blob", "alignments3D", "ctf"],
+)
 job.add_output("volume", "series_pc1", slots=["series"])
 job.add_output("volume", "series_pc2", slots=["series"])
 
@@ -99,12 +109,27 @@ job.log(f"working with a subset of: {subset} of total {number_of_particles} part
 
 # Create subset ind file
 ind_file = f"ind{subset}.pkl"
-job.subprocess(f"cryodrgn_utils select_random {number_of_particles} -n {subset} -o {ind_file}".split(" "), cwd=job.dir(), mute=False, checkpoint=True)
+job.subprocess(
+    f"cryodrgn_utils select_random {number_of_particles} -n {subset} -o {ind_file}".split(" "),
+    cwd=job.dir(),
+    mute=False,
+    checkpoint=True,
+)
 
 # Parse poses and ctf
-job.subprocess(f"cryodrgn parse_pose_csparc {particles_file} -D {initial_particle_size} -o pose.pkl".split(" "), cwd=job.dir(), mute=False, checkpoint=True)
+job.subprocess(
+    f"cryodrgn parse_pose_csparc {particles_file} -D {initial_particle_size} -o pose.pkl".split(" "),
+    cwd=job.dir(),
+    mute=False,
+    checkpoint=True,
+)
 
-job.subprocess(f"cryodrgn parse_ctf_csparc {particles_file} -o ctf.pkl".split(" "), cwd=job.dir(), mute=False, checkpoint=True)
+job.subprocess(
+    f"cryodrgn parse_ctf_csparc {particles_file} -o ctf.pkl".split(" "),
+    cwd=job.dir(),
+    mute=False,
+    checkpoint=True,
+)
 
 multigpu = ""
 gpu_numbers = ""
@@ -128,7 +153,12 @@ cryodrgn_output = f"{job.dir()}/cryodrgn"
 analyze_epoch = int(args.epochs) - 1
 cryodrgn_analyze_output = f"{job.dir()}/cryodrgn_analyze_{analyze_epoch}"
 
-job.subprocess(f"cryodrgn analyze {cryodrgn_output} {analyze_epoch} -o {cryodrgn_analyze_output} --Apix {downsample_apix}".split(" "), cwd=job.dir(), mute=False, checkpoint=True)
+job.subprocess(
+    f"cryodrgn analyze {cryodrgn_output} {analyze_epoch} -o {cryodrgn_analyze_output} --Apix {downsample_apix}".split(" "),
+    cwd=job.dir(),
+    mute=False,
+    checkpoint=True,
+)
 job.log(f"Results can be found in: {cryodrgn_analyze_output}")
 job.log(f"z_pca:")
 job.log_plot(f"{cryodrgn_analyze_output}/z_pca.png", "z_pca")
